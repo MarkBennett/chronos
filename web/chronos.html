@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html>
+<html ng-app>
   <head>
     <meta charset="utf-8">
     <title>Chronos</title>
@@ -9,10 +9,14 @@
   <body>
     <h1>Chronos</h1>
     
-    <p>Hello world from Dart!</p>
-    
-    <div id="sample_container_id">
-      <p id="sample_text_id">Click me!</p>
+    <div class="timesheets" timesheet>
+      <h2>Timesheets</h2>
+      <div class="day">
+        <h3>Feb 13, 2014</h3>
+        <ul ng-repeat="entry in ctrl.timesheet.entries">
+          <li><span class="time">{{ entry.duration }}</span> <span class="description">prototyping UI </span> for <span class="client">@chronos</span></li>
+        </ul>
+      </div>
     </div>
 
     <script type="application/dart" src="chronos.dart"></script>
