@@ -18,7 +18,7 @@
         <h3>{{ ctrl.timesheet.starts_at | date:'mediumDate' }}</h3>
         <ul>
           <li ng-repeat="entry in ctrl.timesheet.entries">
-            <span class="time">{{ entry.duration }}</span> <span class="description">{{ entry.description }}s</span> for <span class="client">@{{ entry.client }}</span>
+            <span class="time">{{ entry.duration }}</span> <span class="description">{{ entry.description }}s</span> for <span class="client">@{{ entry.client }}</span> <button class="delete" ng-click="ctrl.timesheet.entries.remove(entry)">delete</button>
           </li>
         </ul>
         <ul>
