@@ -11,9 +11,9 @@ import '../lib/chronos.dart';
 )
 class TimesheetController {
   Timesheet timesheet = new Timesheet();
-  String hours;
-  String description;
-  String client;
+  String hours = "1";
+  String description = "";
+  String client = "";
 
   TimesheetController() {
     clearNewEntry();
@@ -22,7 +22,6 @@ class TimesheetController {
   clearNewEntry() {
     hours = "1";
     description = "";
-    client = "";
   }
 
   addEntry() {
