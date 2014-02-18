@@ -31,9 +31,17 @@ class TimesheetController {
   }
 }
 
+@NgFilter(name: 'duration')
+class DurationFilter {
+  call(Duration duration) {
+    return "${duration.inHours}:${duration.inMinutes}";
+  }
+}
+
 class ChronosModule extends Module {
   ChronosModule() {
     type(TimesheetController);
+    type(DurationFilter);
   }
 }
 
