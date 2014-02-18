@@ -22,7 +22,7 @@
           </li>
         </ul>
         <ul>
-          <input type="number" ng-model="ctrl.hours" >
+          <input type="number" ng-model="ctrl.hours" step="0.1" >
           <input type="text" ng-model="ctrl.description" placeholder="description">
           <input type="text" ng-model="ctrl.client" placeholder="client">
           <button ng-click="ctrl.addEntry()">Add</button>
