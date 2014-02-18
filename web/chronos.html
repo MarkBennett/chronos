@@ -15,9 +15,11 @@
     <div class="timesheets" timesheet>
       <h2>Timesheets</h2>
       <div class="day">
-        <h3>Feb 13, 2014</h3>
+        <h3>{{ ctrl.timesheet.starts_at | date:'mediumDate' }}</h3>
         <ul>
-          <li ng-repeat="entry in ctrl.timesheet.entries"><span class="time">{{ entry.duration }}</span> <span class="description">{{ entry.description }}s</span> for <span class="client">@{{ entry.client }}</span></li>
+          <li ng-repeat="entry in ctrl.timesheet.entries">
+            <span class="time">{{ entry.duration }}</span> <span class="description">{{ entry.description }}s</span> for <span class="client">@{{ entry.client }}</span>
+          </li>
         </ul>
         <ul>
           <input type="number" ng-model="ctrl.hours" >
