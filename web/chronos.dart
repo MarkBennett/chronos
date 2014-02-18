@@ -11,6 +11,25 @@ import '../lib/chronos.dart';
 )
 class TimesheetController {
   Timesheet timesheet = new Timesheet();
+  String hours;
+  String description;
+  String client;
+
+  TimesheetController() {
+    clearNewEntry();
+  }
+
+  clearNewEntry() {
+    hours = "1";
+    description = "";
+    client = "";
+  }
+
+  addEntry() {
+    timesheet.entries.add(
+        new Entry(new Duration(hours: int.parse(hours, radix: 10)), description, client));
+    clearNewEntry();
+  }
 }
 
 class ChronosModule extends Module {

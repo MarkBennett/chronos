@@ -16,8 +16,14 @@
       <h2>Timesheets</h2>
       <div class="day">
         <h3>Feb 13, 2014</h3>
-        <ul ng-repeat="entry in ctrl.timesheet.entries">
-          <li><span class="time">{{ entry.duration }}</span> <span class="description">{{ entry.description }}s</span> for <span class="client">@{{ entry.client }}</span></li>
+        <ul>
+          <li ng-repeat="entry in ctrl.timesheet.entries"><span class="time">{{ entry.duration }}</span> <span class="description">{{ entry.description }}s</span> for <span class="client">@{{ entry.client }}</span></li>
+        </ul>
+        <ul>
+          <input type="number" ng-model="ctrl.hours" >
+          <input type="text" ng-model="ctrl.description" >
+          <input type="text" ng-model="ctrl.client" >
+          <button ng-click="ctrl.addEntry()">Add</button>
         </ul>
       </div>
     </div>
