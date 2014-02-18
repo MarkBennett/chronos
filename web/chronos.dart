@@ -34,7 +34,7 @@ class TimesheetController {
 @NgFilter(name: 'duration')
 class DurationFilter {
   call(Duration duration) {
-    return "${duration.inHours}:${duration.inMinutes}";
+    return "${duration.inHours}:${duration.inMinutes - (duration.inHours * 60)}";
   }
 }
 
