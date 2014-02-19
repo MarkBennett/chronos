@@ -1,9 +1,11 @@
 import 'package:angular/angular.dart';
+import 'package:lawndart/lawndart.dart';
 
 @MirrorsUsed(override: '*')
 import 'dart:mirrors';
 
 import 'dart:async';
+import 'dart:convert' show JSON;
 
 import '../lib/chronos.dart';
 
@@ -69,17 +71,29 @@ class DurationFilter {
 }
 
 class EntriesResource {
-  List<Entry> entries = [
-    new Entry(new Duration(hours: 1, minutes: 30), "prototyping UI", "chronos"),
-    new Entry(new Duration(hours: 1), "adding behaviour", "chronos")
-  ];
+  List<Entry> entries = [];
+
+  Future _loaded;
+
+  Store _db;
+
+  EntriesResource() {
+    _db = new Store("chronos", "entries");
+
+    _loaded = _db.open().then((_) {
+      entries = [];
+      return _db.all().forEach((json) => entries.add(new Entry.fromJson(JSON.decode(json))));
+    });
+  }
 
   Future add(Entry entry) {
-    entries.add(entry);
+    return _loaded.then((_) {
+      entries.add(entry);
 
-    print("Adding entry");
+      print("Adding entry");
 
-    return new Future.value(entry);
+      return _db.save(JSON.encode(entry), entry.id);
+    });
   }
 
   Future remove(Entry entry) {
@@ -87,10 +101,10 @@ class EntriesResource {
 
     print("Removing entry");
 
-    return new Future.value(entry);
+    return _db.removeByKey(entry.id);
   }
 
-  Future getAll() => new Future.value(new List.from(entries));
+  Future getAll() => _loaded.then((_) => new List.from(entries));
 }
 
 class ChronosModule extends Module {
