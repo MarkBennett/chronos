@@ -15,8 +15,8 @@ import '../lib/chronos.dart';
 )
 class TimesheetController {
   Timesheet timesheet = new Timesheet();
-  String hours = "1";
-  String minutes = "0";
+  int hours = 1;
+  int minutes = 0;
   String description = "";
   String client = "";
   EntriesResource _entries_resource;
@@ -34,8 +34,8 @@ class TimesheetController {
   }
 
   clearNewEntry() {
-    hours = "1";
-    minutes = "0";
+    hours = 1;
+    minutes = 0;
 
     description = "";
   }
@@ -43,8 +43,8 @@ class TimesheetController {
   addEntry() {
     Duration duration =
         new Duration(
-            hours: int.parse(hours, radix: 10),
-            minutes: int.parse(minutes, radix: 10));
+            hours: hours,
+            minutes: minutes);
     Entry entry = new Entry(duration, description, client);
 
     _loaded.then((_) {
