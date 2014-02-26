@@ -1,4 +1,4 @@
-name: Chronos
+name: chronos
 description: A sample web application
 dependencies:
   angular: any

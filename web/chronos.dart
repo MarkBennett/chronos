@@ -1,13 +1,14 @@
 import 'package:angular/angular.dart';
 import 'package:lawndart/lawndart.dart';
 
-@MirrorsUsed(override: '*')
+@MirrorsUsed(override: '*', targets: const ['chronos'])
 import 'dart:mirrors';
 
 import 'dart:async';
 import 'dart:convert' show JSON;
 
 import '../lib/chronos.dart';
+import 'package:chronos/chronos.dart';
 
 @NgController(
     selector: "[timesheet]",
@@ -71,6 +72,7 @@ class DurationFilter {
 }
 
 class EntriesResource {
+@NgInjectableService()
   List<Entry> entries = [];
 
   Future _loaded;

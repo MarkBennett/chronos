@@ -18,11 +18,14 @@
         <h3>{{ ctrl.timesheet.starts_at | date:'mediumDate' }}</h3>
         <ul>
           <li ng-repeat="entry in ctrl.timesheet.entries">
-            <span class="time">{{ entry.duration | duration }}</span> <span class="description">{{ entry.description }}s</span> for <span class="client">@{{ entry.client }}</span> <button class="delete" ng-click="ctrl.removeEntry(entry)">delete</button>
+            <span class="time">{{ entry.duration | duration }}</span> <span class="description">{{ entry.description }}</span> for <span class="client">@{{ entry.client }}</span>
+            <button class="delete" ng-click="ctrl.removeEntry(entry)">delete</button>
+            <button class="edit" ng-click="ctrl.editEntry(entry)">edit</button>
           </li>
         </ul>
         <ul>
           <form ng-submit="ctrl.addEntry()">
+            <input type="text" ng-model="ctrl.id">
             <input type="number" ng-model="ctrl.hours" min="0" max="24">
             <input type="number" ng-model="ctrl.minutes" min="0" max="60" >
             <input type="text" ng-model="ctrl.description" placeholder="description">
@@ -35,5 +38,6 @@
 
     <script type="application/dart" src="chronos.dart"></script>
     <script src="packages/browser/dart.js"></script>
+    <script src="packages/browser/interop.js"></script>
   </body>
 </html>

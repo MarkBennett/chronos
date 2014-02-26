@@ -11,9 +11,7 @@ class Entry {
   String description;
   String client;
 
-  Entry(this.duration, this.description, this.client) {
-    id = new DateTime.now().millisecondsSinceEpoch.toString();
-  }
+  Entry(this.id, this.duration, this.description, this.client);
 
   Entry.fromJson(Map json) {
     id = json['id'];
