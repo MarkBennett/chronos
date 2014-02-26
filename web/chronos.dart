@@ -5,9 +5,8 @@ import 'package:lawndart/lawndart.dart';
 import 'dart:mirrors';
 
 import 'dart:async';
-import 'dart:convert' show JSON;
+import 'dart:convert' show JSON, Latin1Decoder;
 
-import '../lib/chronos.dart';
 import 'package:chronos/chronos.dart';
 
 @NgController(
@@ -16,6 +15,7 @@ import 'package:chronos/chronos.dart';
 )
 class TimesheetController {
   Timesheet timesheet = new Timesheet();
+  String id = "";
   int hours = 1;
   int minutes = 0;
   String description = "";
@@ -35,10 +35,19 @@ class TimesheetController {
   }
 
   clearNewEntry() {
+    id = "";
     hours = 1;
     minutes = 0;
 
     description = "";
+  }
+
+  editEntry(Entry entry) {
+    id = entry.id;
+    hours = entry.duration.inHours;
+    minutes = entry.duration.inMinutes - (entry.duration.inHours * 60);
+    description = entry.description;
+    client = entry.client;
   }
 
   addEntry() {
@@ -46,14 +55,32 @@ class TimesheetController {
         new Duration(
             hours: hours,
             minutes: minutes);
-    Entry entry = new Entry(duration, description, client);
+    Entry entry = new Entry(id, duration, description, client);
 
     _loaded.then((_) {
-      timesheet.entries.add(entry);
-      _entries_resource.add(entry);
+      if (entry.id == "") {
+        _addEntry(entry);
+      } else {
+        _saveEntry(entry);
+      }
 
       clearNewEntry();
     });
+  }
+
+  _addEntry(Entry entry) {
+    entry.id = new DateTime.now().millisecondsSinceEpoch.toString();
+    timesheet.entries.add(entry);
+    _entries_resource.add(entry);
+  }
+
+  _saveEntry(Entry entry) {
+    timesheet.entries.where((e) => id == e.id).forEach((Entry e) {
+      e.client = entry.client;
+      e.description = entry.description;
+      e.duration = entry.duration;
+    });
+    _entries_resource.save(entry);
   }
 
   removeEntry(Entry entry) {
@@ -71,8 +98,15 @@ class DurationFilter {
   }
 }
 
-class EntriesResource {
+abstract class Resource {
+  Future add(dynamic entity);
+  Future remove(dynamic entity);
+  Future save(dynamic entity);
+  Future getAll();
+}
+
 @NgInjectableService()
+class EntriesResource implements Resource {
   List<Entry> entries = [];
 
   Future _loaded;
@@ -107,6 +141,12 @@ class EntriesResource {
   }
 
   Future getAll() => _loaded.then((_) => new List.from(entries));
+
+  Future save(Entry entry) {
+    return _loaded.then((_) {
+      return _db.save(JSON.encode(entry), entry.id);
+    });
+  }
 }
 
 class ChronosModule extends Module {
@@ -117,4 +157,6 @@ class ChronosModule extends Module {
   }
 }
 
-main() => ngBootstrap(module: new ChronosModule());
+main() {
+  ngBootstrap(module: new ChronosModule());
+}
