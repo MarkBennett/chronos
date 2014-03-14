@@ -51,7 +51,6 @@ class TimesheetController {
   }
 
   addEntry() {
-    print("hours = $hours");
     Duration duration =
         new Duration(
             hours: hours.floor(),
@@ -127,16 +126,12 @@ class EntriesResource implements Resource {
     return _loaded.then((_) {
       entries.add(entry);
 
-      print("Adding entry");
-
       return _db.save(JSON.encode(entry), entry.id);
     });
   }
 
   Future remove(Entry entry) {
     entries.remove(entry);
-
-    print("Removing entry");
 
     return _db.removeByKey(entry.id);
   }
