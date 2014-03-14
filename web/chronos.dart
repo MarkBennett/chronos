@@ -14,10 +14,10 @@ import 'package:chronos/chronos.dart';
     publishAs: 'ctrl'
 )
 class TimesheetController {
-  Timesheet timesheet = new Timesheet();
+  Timesheet timesheet = new Timesheet.withDefaults();
   String id = "";
-  int hours = 1;
-  int minutes = 0;
+  double hours = 1.0;
+  double minutes = 0.0;
   String description = "";
   String client = "";
   EntriesResource _entries_resource;
@@ -36,25 +36,26 @@ class TimesheetController {
 
   clearNewEntry() {
     id = "";
-    hours = 1;
-    minutes = 0;
+    hours = 1.0;
+    minutes = 0.0;
 
     description = "";
   }
 
   editEntry(Entry entry) {
     id = entry.id;
-    hours = entry.duration.inHours;
-    minutes = entry.duration.inMinutes - (entry.duration.inHours * 60);
+    hours = entry.duration.inHours.toDouble();
+    minutes = entry.duration.inMinutes - (entry.duration.inHours * 60).toDouble();
     description = entry.description;
     client = entry.client;
   }
 
   addEntry() {
+    print("hours = $hours");
     Duration duration =
         new Duration(
-            hours: hours,
-            minutes: minutes);
+            hours: hours.floor(),
+            minutes: minutes.floor());
     Entry entry = new Entry(id, duration, description, client);
 
     _loaded.then((_) {
@@ -94,7 +95,7 @@ class TimesheetController {
 @NgFilter(name: 'duration')
 class DurationFilter {
   call(Duration duration) {
-    return "${duration.inHours}:${duration.inMinutes - (duration.inHours * 60)}";
+    return "${duration.inHours}:${(duration.inMinutes - (duration.inHours * 60)).toString().padLeft(2, "0")}";
   }
 }
 
