@@ -22,6 +22,7 @@ class TimesheetController {
   String client = "";
   EntriesResource _entries_resource;
   Future _loaded;
+  String formActionName = "Add";
 
   TimesheetController(EntriesResource this._entries_resource) {
     clearNewEntry();
@@ -40,6 +41,8 @@ class TimesheetController {
     minutes = 0.0;
 
     description = "";
+
+    formActionName = "Add";
   }
 
   editEntry(Entry entry) {
@@ -48,6 +51,8 @@ class TimesheetController {
     minutes = entry.duration.inMinutes - (entry.duration.inHours * 60).toDouble();
     description = entry.description;
     client = entry.client;
+
+    formActionName = "Save";
   }
 
   addEntry() {
