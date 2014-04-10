@@ -9,30 +9,31 @@ import 'dart:convert' show JSON, Latin1Decoder;
 
 import 'package:chronos/chronos.dart';
 
-@NgController(
-    selector: "[timesheet]",
-    publishAs: 'ctrl'
-)
+@NgController(selector: "[timesheet]", publishAs: 'ctrl')
 class TimesheetController {
-  Timesheet timesheet = new Timesheet.withDefaults();
+
+  List<Timesheet> timesheets;
+  Timesheet timesheet;
   String id = "";
   double hours = 1.0;
   double minutes = 0.0;
   String description = "";
   String client = "";
-  EntriesResource _entries_resource;
+  TimesheetResource _timesheets_resource;
   Future _loaded;
   String formActionName = "Add";
 
-  TimesheetController(EntriesResource this._entries_resource) {
+  TimesheetController(TimesheetResource this._timesheets_resource) {
     clearNewEntry();
     _loadData();
   }
 
   _loadData() {
-    _loaded =
-        _entries_resource.getAll().
-          then((List<Entry> entries) => timesheet.entries = entries);
+    _loaded = _timesheets_resource.getAll().
+        then((List<Timesheet> t) {
+          timesheets = t;
+          timesheet = timesheets.first;
+        });
   }
 
   clearNewEntry() {
@@ -48,7 +49,8 @@ class TimesheetController {
   editEntry(Entry entry) {
     id = entry.id;
     hours = entry.duration.inHours.toDouble();
-    minutes = entry.duration.inMinutes - (entry.duration.inHours * 60).toDouble();
+    minutes = entry.duration.inMinutes - (entry.duration.inHours * 60).toDouble(
+        );
     description = entry.description;
     client = entry.client;
 
@@ -56,10 +58,8 @@ class TimesheetController {
   }
 
   addEntry() {
-    Duration duration =
-        new Duration(
-            hours: hours.floor(),
-            minutes: minutes.floor());
+    Duration duration = new Duration(hours: hours.floor(), minutes:
+        minutes.floor());
     Entry entry = new Entry(id, duration, description, client);
 
     _loaded.then((_) {
@@ -76,7 +76,7 @@ class TimesheetController {
   _addEntry(Entry entry) {
     entry.id = new DateTime.now().millisecondsSinceEpoch.toString();
     timesheet.entries.add(entry);
-    _entries_resource.add(entry);
+    _timesheets_resource.save(timesheet);
   }
 
   _saveEntry(Entry entry) {
@@ -85,13 +85,13 @@ class TimesheetController {
       e.description = entry.description;
       e.duration = entry.duration;
     });
-    _entries_resource.save(entry);
+    _timesheets_resource.save(timesheet);
   }
 
   removeEntry(Entry entry) {
     _loaded.then((_) {
       timesheet.entries.remove(entry);
-      _entries_resource.remove(entry);
+      _timesheets_resource.save(timesheet);
     });
   }
 }
@@ -99,7 +99,8 @@ class TimesheetController {
 @NgFilter(name: 'duration')
 class DurationFilter {
   call(Duration duration) {
-    return "${duration.inHours}:${(duration.inMinutes - (duration.inHours * 60)).toString().padLeft(2, "0")}";
+    return
+        "${duration.inHours}:${(duration.inMinutes - (duration.inHours * 60)).toString().padLeft(2, "0")}";
   }
 }
 
@@ -111,41 +112,42 @@ abstract class Resource {
 }
 
 @NgInjectableService()
-class EntriesResource implements Resource {
-  List<Entry> entries = [];
+class TimesheetResource implements Resource {
+  List<Timesheet> timesheets = [];
 
   Future _loaded;
 
   Store _db;
 
-  EntriesResource() {
-    _db = new Store("chronos", "entries");
+  TimesheetResource() {
+    _db = new Store("chronos", "timesheets");
 
     _loaded = _db.open().then((_) {
-      entries = [];
-      return _db.all().forEach((json) => entries.add(new Entry.fromJson(JSON.decode(json))));
+      timesheets = [];
+      return _db.all().forEach((json) => timesheets.add(new Timesheet.fromJson(
+          JSON.decode(json))));
     });
   }
 
-  Future add(Entry entry) {
+  Future add(Timesheet timesheet) {
     return _loaded.then((_) {
-      entries.add(entry);
+      timesheets.add(timesheet);
 
-      return _db.save(JSON.encode(entry), entry.id);
+      return _db.save(JSON.encode(timesheet), timesheet.id);
     });
   }
 
-  Future remove(Entry entry) {
-    entries.remove(entry);
+  Future remove(Timesheet timesheet) {
+    timesheets.remove(timesheet);
 
-    return _db.removeByKey(entry.id);
+    return _db.removeByKey(timesheet.id);
   }
 
-  Future getAll() => _loaded.then((_) => new List.from(entries));
+  Future getAll() => _loaded.then((_) => new List.from(timesheets));
 
-  Future save(Entry entry) {
+  Future save(Timesheet timesheet) {
     return _loaded.then((_) {
-      return _db.save(JSON.encode(entry), entry.id);
+      return _db.save(JSON.encode(timesheet), timesheet.id);
     });
   }
 }
@@ -154,7 +156,7 @@ class ChronosModule extends Module {
   ChronosModule() {
     type(TimesheetController);
     type(DurationFilter);
-    type(EntriesResource);
+    type(TimesheetResource);
   }
 }
 

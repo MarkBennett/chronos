@@ -1,6 +1,7 @@
 part of chronos;
 
 class Timesheet {
+
   String id;
   List<Entry> entries = [];
   DateTime starts_at = new DateTime.now();
@@ -11,14 +12,14 @@ class Timesheet {
 
   Timesheet.fromJson(Map json) {
     id = json['id'];
-    entries = json['entries'].map((Map e) => new Entry.fromJson(e));
+    entries = (json['entries'] as List).map((Map e) => new Entry.fromJson(e)).toList();
     starts_at = new DateTime.fromMillisecondsSinceEpoch(json['starts_at'], isUtc: true);
   }
 
   Map toJson() {
     return {
       'id': id,
-      'entries': entries.map((Entry e) => e.toJson()),
+      'entries': entries.map((Entry e) => e.toJson()).toList(),
       'starts_at': starts_at.toUtc().millisecondsSinceEpoch
     };
   }
