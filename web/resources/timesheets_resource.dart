@@ -41,6 +41,14 @@ class TimesheetResource implements Resource {
 
   Future getAll() => _loaded.then((_) => new List.from(timesheets));
 
+  Future<Timesheet> today() {
+    return new Future.value(new Timesheet("1", [], new DateTime.now()));
+  }
+
+  Future<List<Timesheet>> where({DateTime day}) {
+    return new Future.value([new Timesheet.withDefaults()]);
+  }
+
   Future save(Timesheet timesheet) {
     return _loaded.then((_) {
       return _db.save(JSON.encode(timesheet), timesheet.id);

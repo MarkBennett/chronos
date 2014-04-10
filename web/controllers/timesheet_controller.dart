@@ -19,8 +19,7 @@ class TimesheetController {
   }
 
   _loadData() {
-    _loaded = _timesheets_resource.getDay(new DateTime.now()).
-        then((Timesheet t) => timesheet = t);
+    _loaded = _timesheets_resource.today().then((today) => timesheet = today);
   }
 
   clearNewEntry() {
