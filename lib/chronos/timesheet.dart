@@ -13,14 +13,14 @@ class Timesheet {
   Timesheet.fromJson(Map json) {
     id = json['id'];
     entries = (json['entries'] as List).map((Map e) => new Entry.fromJson(e)).toList();
-    starts_at = new DateTime.fromMillisecondsSinceEpoch(json['starts_at'], isUtc: true);
+    starts_at = new DateTime.fromMillisecondsSinceEpoch(json['starts_at']);
   }
 
   Map toJson() {
     return {
       'id': id,
       'entries': entries.map((Entry e) => e.toJson()).toList(),
-      'starts_at': starts_at.toUtc().millisecondsSinceEpoch
+      'starts_at': starts_at.millisecondsSinceEpoch
     };
   }
 }

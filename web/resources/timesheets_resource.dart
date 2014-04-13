@@ -42,7 +42,24 @@ class TimesheetResource implements Resource {
   Future getAll() => _loaded.then((_) => new List.from(timesheets));
 
   Future<Timesheet> today() {
-    return new Future.value(new Timesheet("1", [], new DateTime.now()));
+    return _loaded.then((_) {
+      Timesheet today;
+
+      DateTime todays_date = new DateTime.now();
+
+      var matches = timesheets.where((Timesheet timesheet) =>
+          timesheet.starts_at.year == todays_date.year &&
+          timesheet.starts_at.month == todays_date.month &&
+          timesheet.starts_at.day == todays_date.day);
+
+      if (matches.isNotEmpty) {
+        today = matches.first;
+        return today;
+      } else {
+        today = new Timesheet("1", [], new DateTime.now());
+        return add(today).then((_) => today);
+      }
+    });
   }
 
   Future<List<Timesheet>> where({DateTime day}) {
