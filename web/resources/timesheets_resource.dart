@@ -43,14 +43,11 @@ class TimesheetResource implements Resource {
 
   Future<Timesheet> today() {
     return _loaded.then((_) {
-      Timesheet today;
-
       DateTime todays_date = new DateTime.now();
 
-      var matches = timesheets.where((Timesheet timesheet) =>
-          timesheet.starts_at.year == todays_date.year &&
-          timesheet.starts_at.month == todays_date.month &&
-          timesheet.starts_at.day == todays_date.day);
+      return where(starts_at: todays_date);
+    }).then((matches) {
+      Timesheet today;
 
       if (matches.isNotEmpty) {
         today = matches.first;
@@ -62,8 +59,19 @@ class TimesheetResource implements Resource {
     });
   }
 
-  Future<List<Timesheet>> where({DateTime day}) {
-    return new Future.value([new Timesheet.withDefaults()]);
+  Future<List<Timesheet>> where({DateTime starts_at}) {
+    return _loaded.then((_) {
+      var matches = timesheets;
+
+      if (starts_at != null) {
+        matches = matches.where((Timesheet timesheet) =>
+          timesheet.starts_at.year == starts_at.year &&
+          timesheet.starts_at.month == starts_at.month &&
+          timesheet.starts_at.day == starts_at.day);
+      }
+
+      return matches.toList();
+    });
   }
 
   Future save(Timesheet timesheet) {
