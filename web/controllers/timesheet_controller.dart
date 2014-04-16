@@ -80,4 +80,14 @@ class TimesheetController {
       _timesheets_resource.save(timesheet);
     });
   }
+
+  toPrevDay() {
+    _timesheets_resource.prevDay(timesheet).
+      then((prev_days_timesheet) => timesheet = prev_days_timesheet);
+  }
+
+  toNextDay() {
+    _timesheets_resource.nextDay(timesheet).
+      then((prev_days_timesheet) => timesheet = prev_days_timesheet);
+  }
 }

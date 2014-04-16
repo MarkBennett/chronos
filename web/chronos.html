@@ -15,7 +15,7 @@
     <div class="timesheets" timesheet>
       <h2>Timesheets</h2>
       <div class="day">
-        <h3><span ng-click="toPrevDay">&lt;</span> {{ ctrl.timesheet.starts_at | date:'mediumDate' }} <span ng-click="ctrl.toNextDay">&gt;</span></span></h3>
+        <h3><span ng-click="ctrl.toPrevDay()">&lt;</span> {{ ctrl.timesheet.starts_at | date:'mediumDate' }} <span ng-click="ctrl.toNextDay()">&gt;</span></span></h3>
         <ul>
           <li ng-repeat="entry in ctrl.timesheet.entries">
             <span class="time">{{ entry.duration | duration }}</span> <span class="description">{{ entry.description }}</span> for <span class="client">@{{ entry.client }}</span>

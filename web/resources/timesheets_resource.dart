@@ -79,4 +79,36 @@ class TimesheetResource implements Resource {
       return _db.save(JSON.encode(timesheet), timesheet.id);
     });
   }
+
+  Future<Timesheet> prevDay(Timesheet timesheet) {
+    DateTime previous_day = timesheet.starts_at.subtract(new Duration(days: 1));
+
+    return where(starts_at: previous_day).then((matches) {
+      if (matches.isNotEmpty) {
+        return matches.first;
+      } else {
+        Timesheet timesheet =
+            new Timesheet(new DateTime.now().millisecondsSinceEpoch.toString(),
+                [], previous_day);
+        timesheets.add(timesheet);
+        return timesheet;
+      }
+    });
+  }
+
+  Future<Timesheet> nextDay(Timesheet timesheet) {
+    DateTime next_day = timesheet.starts_at.add(new Duration(days: 1));
+
+    return where(starts_at: next_day).then((matches) {
+      if (matches.isNotEmpty) {
+        return matches.first;
+      } else {
+        Timesheet timesheet =
+            new Timesheet(new DateTime.now().millisecondsSinceEpoch.toString(),
+                [], next_day);
+        timesheets.add(timesheet);
+        return timesheet;
+      }
+    });
+  }
 }
