@@ -1,7 +1,11 @@
 part of chronos_web;
 
-@Controller(selector: "[timesheet]", publishAs: 'ctrl')
-class TimesheetController {
+@Component(
+    selector: "timesheet",
+    templateUrl: "packages/chronos/components/timesheet/timesheet_component.html",
+    cssUrl: "packages/chronos/components/timesheet/timesheet_component.css",
+    publishAs: 'ctrl')
+class TimesheetComponent {
 
   Timesheet timesheet;
   String id = "";
@@ -13,7 +17,7 @@ class TimesheetController {
   Future _loaded;
   String formActionName = "Add";
 
-  TimesheetController(TimesheetResource this._timesheets_resource) {
+  TimesheetComponent(TimesheetResource this._timesheets_resource) {
     clearNewEntry();
     _loadData();
   }

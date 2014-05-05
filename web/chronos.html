@@ -12,28 +12,8 @@
   <body ng-cloak>
     <h1>Chronos</h1>
 
-    <div class="timesheets" timesheet>
-      <h2>Timesheets</h2>
-      <div class="day">
-        <h3><span ng-click="ctrl.toPrevDay()">&lt;</span> {{ ctrl.timesheet.starts_at | date:'mediumDate' }} <span ng-click="ctrl.toNextDay()">&gt;</span></span></h3>
-        <ul>
-          <li ng-repeat="entry in ctrl.timesheet.entries">
-            <span class="time">{{ entry.duration | duration }}</span> <span class="description">{{ entry.description }}</span> for <span class="client">@{{ entry.client }}</span>
-            <button class="delete" ng-click="ctrl.removeEntry(entry)">delete</button>
-            <button class="edit" ng-click="ctrl.editEntry(entry)">edit</button>
-          </li>
-        </ul>
-        <ul>
-          <form ng-submit="ctrl.addEntry()">
-            <input type="number" ng-model="ctrl.hours" min="0" max="24">
-            <input type="number" ng-model="ctrl.minutes" min="0" max="60" >
-            <input type="text" ng-model="ctrl.description" placeholder="description">
-            <input type="text" ng-model="ctrl.client" placeholder="client">
-            <button type="submit">{{ ctrl.formActionName }}</button>
-          </form>
-        </ul>
-      </div>
-    </div>
+    <timesheet></timesheet>
+
     <script src="packages/shadow_dom/shadow_dom.min.js"></script>
     <script type="application/dart" src="chronos.dart"></script>
     <script type="text/javascript" src="packages/browser/dart.js"></script>

@@ -12,15 +12,15 @@ import 'dart:convert' show JSON, Latin1Decoder;
 
 import 'package:chronos/chronos.dart';
 
-part 'controllers/timesheet_controller.dart';
-part 'filters/duration_filter.dart';
-part 'resources/timesheets_resource.dart';
+part 'packages/chronos/components/timesheet/timesheet_component.dart';
+part 'packages/chronos/filters/duration_filter.dart';
+part 'packages/chronos/resources/timesheets_resource.dart';
 
 class ChronosModule extends Module {
   ChronosModule() {
-    type(TimesheetResource);
-    type(TimesheetController);
-    type(DurationFilter);
+    bind(TimesheetResource);
+    bind(TimesheetComponent);
+    bind(DurationFilter);
   }
 }
 
