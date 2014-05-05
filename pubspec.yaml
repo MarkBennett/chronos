@@ -4,3 +4,6 @@ dependencies:
   angular: any
   browser: any
   lawndart: any
+
+transformers:
+- angular

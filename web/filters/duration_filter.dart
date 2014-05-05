@@ -1,6 +1,6 @@
 part of chronos_web;
 
-@NgFilter(name: 'duration')
+@Formatter(name: 'duration')
 class DurationFilter {
   call(Duration duration) {
     return

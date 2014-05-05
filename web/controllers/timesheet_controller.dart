@@ -1,6 +1,6 @@
 part of chronos_web;
 
-@NgController(selector: "[timesheet]", publishAs: 'ctrl')
+@Controller(selector: "[timesheet]", publishAs: 'ctrl')
 class TimesheetController {
 
   Timesheet timesheet;

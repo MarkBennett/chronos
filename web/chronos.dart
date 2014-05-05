@@ -1,9 +1,10 @@
 library chronos_web;
 
 import 'package:angular/angular.dart';
+import 'package:angular/application_factory.dart';
 import 'package:lawndart/lawndart.dart';
 
-@MirrorsUsed(override: '*', targets: const ['chronos'])
+@MirrorsUsed(override: '*')
 import 'dart:mirrors';
 
 import 'dart:async';
@@ -17,12 +18,12 @@ part 'resources/timesheets_resource.dart';
 
 class ChronosModule extends Module {
   ChronosModule() {
+    type(TimesheetResource);
     type(TimesheetController);
     type(DurationFilter);
-    type(TimesheetResource);
   }
 }
 
 main() {
-  ngBootstrap(module: new ChronosModule());
+  applicationFactory().addModule(new ChronosModule()).run();
 }
