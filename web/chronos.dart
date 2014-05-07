@@ -12,9 +12,9 @@ import 'dart:convert' show JSON, Latin1Decoder;
 
 import 'package:chronos/chronos.dart';
 
-part 'packages/chronos/components/timesheet/timesheet_component.dart';
-part 'packages/chronos/filters/duration_filter.dart';
-part 'packages/chronos/resources/timesheets_resource.dart';
+part 'package:chronos/components/timesheet/timesheet_component.dart';
+part 'package:chronos/filters/duration_filter.dart';
+part 'package:chronos/resources/timesheets_resource.dart';
 
 class ChronosModule extends Module {
   ChronosModule() {

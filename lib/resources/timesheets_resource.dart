@@ -7,6 +7,7 @@ abstract class Resource {
   Future getAll();
 }
 
+@Injectable()
 class TimesheetResource implements Resource {
   List<Timesheet> timesheets = [];
 
