@@ -1,4 +1,12 @@
-part of chronos_web;
+library timesheets_resource;
+
+import 'dart:async';
+import 'dart:convert' show JSON, Latin1Decoder;
+
+import 'package:angular/angular.dart';
+import 'package:lawndart/lawndart.dart';
+
+import 'package:chronos/chronos.dart';
 
 abstract class Resource {
   Future add(dynamic entity);

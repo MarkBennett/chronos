@@ -1,4 +1,6 @@
-part of chronos_web;
+library duration_filter;
+
+import 'package:angular/angular.dart';
 
 @Formatter(name: 'duration')
 class DurationFilter {

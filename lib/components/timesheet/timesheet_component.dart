@@ -1,4 +1,11 @@
-part of chronos_web;
+library timesheet_component;
+
+import 'dart:async';
+
+import 'package:angular/angular.dart';
+
+import 'package:chronos/chronos.dart';
+import 'package:chronos/resources/timesheets_resource.dart';
 
 @Component(
     selector: "timesheet",
@@ -93,5 +100,9 @@ class TimesheetComponent {
   toNextDay() {
     _timesheets_resource.nextDay(timesheet).
       then((prev_days_timesheet) => timesheet = prev_days_timesheet);
+  }
+  
+  onKeypress(event) {
+    print("You're typing?");
   }
 }
