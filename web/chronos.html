@@ -8,13 +8,14 @@
     <style>
       [ng-cloak] { visibility: hidden; }
     </style>
+    <script src="packages/web_components/platform.js"></script>
+    <script src="packages/web_components/dart_support.js"></script>
   </head>
   <body ng-cloak>
     <h1>Chronos</h1>
 
     <timesheet></timesheet>
 
-    <script src="packages/shadow_dom/shadow_dom.min.js"></script>
     <script type="application/dart" src="chronos.dart"></script>
     <script type="text/javascript" src="packages/browser/dart.js"></script>
   </body>

@@ -4,7 +4,6 @@ dependencies:
   angular: any
   browser: any
   lawndart: any
-  shadow_dom: any
-
+  web_components: any
 transformers:
 - angular
