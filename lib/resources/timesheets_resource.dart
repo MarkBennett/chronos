@@ -4,6 +4,9 @@ import 'dart:async';
 import 'dart:convert' show JSON, Latin1Decoder;
 
 import 'package:angular/angular.dart';
+import "package:google_drive_v2_api/drive_v2_api_browser.dart" as driveclient;
+import "package:google_drive_v2_api/drive_v2_api_client.dart";
+import 'package:google_oauth2_client/google_oauth2_browser.dart';
 import 'package:lawndart/lawndart.dart';
 
 import 'package:chronos/chronos.dart';
@@ -22,29 +25,70 @@ class TimesheetResource implements Resource {
   Future _loaded;
 
   Store _db;
-
+  
+  driveclient.Drive _drive;
+  String _data_file_id;
+  
   TimesheetResource() {
+    
     _db = new Store("chronos", "timesheets");
 
-    _loaded = _db.open().then((_) {
-      timesheets = [];
-      return _db.all().forEach((json) => timesheets.add(new Timesheet.fromJson(
-          JSON.decode(json))));
+    _loaded = _loadTimesheetsFromDrive();
+  }
+  
+  driveclient.Drive _createAuthorizedDriveClient() {
+    driveclient.Drive drive;
+    
+    GoogleOAuth2 auth =
+        new GoogleOAuth2("616311253486.apps.googleusercontent.com",
+            ["https://www.googleapis.com/auth/drive.appdata"]);
+    drive = new driveclient.Drive(auth);
+    drive.makeAuthRequests = true;
+    
+    return drive;
+  }
+  
+  Future _loadTimesheetsFromDrive() {
+    _drive = _createAuthorizedDriveClient();
+    
+    // Load and parse the chronos files
+    return _loadDataFile();
+  }
+
+  Future _loadDataFile() {
+    return _searchForDataFileCandidates().then((data_files) {
+      if (data_files.items.isEmpty) {
+        return _intializeDataFile();
+      } else {
+        return _parseDataFile(data_files.items.first.id);
+      }
+    }).then((data_file_id) {
+      _data_file_id = data_file_id;
     });
+  }
+
+  Future<FileList> _searchForDataFileCandidates() => _drive.files.list(q: "title = 'data_file.json' and 'appdata' in parents");
+  
+  Future<String> _parseDataFile(String data_file_id) {
+    return new Future.value("1");
+  }
+  
+  Future<String> _intializeDataFile() {
+    return new Future.value("1");
   }
 
   Future add(Timesheet timesheet) {
     return _loaded.then((_) {
       timesheets.add(timesheet);
 
-      return _db.save(JSON.encode(timesheet), timesheet.id);
+//      return _db.save(JSON.encode(timesheet), timesheet.id);
     });
   }
 
   Future remove(Timesheet timesheet) {
     timesheets.remove(timesheet);
 
-    return _db.removeByKey(timesheet.id);
+//    return _db.removeByKey(timesheet.id);
   }
 
   Future getAll() => _loaded.then((_) => new List.from(timesheets));

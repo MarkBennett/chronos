@@ -3,6 +3,7 @@ description: A sample web application
 dependencies:
   angular: any
   browser: any
+  google_drive_v2_api: any
   lawndart: any
   web_components: any
 transformers:
