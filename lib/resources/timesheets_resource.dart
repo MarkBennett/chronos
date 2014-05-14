@@ -100,7 +100,7 @@ class TimesheetResource implements Resource {
   Future remove(Timesheet timesheet) {
     timesheets.remove(timesheet);
 
-//    return _db.removeByKey(timesheet.id);
+    return new Future.value(timesheet);
   }
 
   Future getAll() => _loaded.then((_) => new List.from(timesheets));
@@ -134,7 +134,7 @@ class TimesheetResource implements Resource {
           timesheet.starts_at.day == starts_at.day);
       }
 
-      return matches.toList();
+      return new Future.value(matches.toList());
     });
   }
 
