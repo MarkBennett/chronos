@@ -32,7 +32,7 @@ packages:
   cipher:
     description: cipher
     source: hosted
-    version: "0.7.0"
+    version: "0.7.1"
   code_transformers:
     description: code_transformers
     source: hosted
@@ -56,7 +56,7 @@ packages:
   google_drive_v2_api:
     description: google_drive_v2_api
     source: hosted
-    version: "0.4.12"
+    version: "0.4.13"
   google_oauth2_client:
     description: google_oauth2_client
     source: hosted
@@ -72,7 +72,7 @@ packages:
   intl:
     description: intl
     source: hosted
-    version: "0.9.8"
+    version: "0.9.9"
   json_web_token:
     description: json_web_token
     source: hosted

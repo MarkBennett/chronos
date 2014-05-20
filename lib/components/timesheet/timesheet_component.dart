@@ -73,7 +73,6 @@ class TimesheetComponent {
   _addEntry(Entry entry) {
     entry.id = new DateTime.now().millisecondsSinceEpoch.toString();
     timesheet.entries.add(entry);
-    _timesheets_resource.save(timesheet);
   }
 
   _saveEntry(Entry entry) {
@@ -88,7 +87,6 @@ class TimesheetComponent {
   removeEntry(Entry entry) {
     _loaded.then((_) {
       timesheet.entries.remove(entry);
-      _timesheets_resource.save(timesheet);
     });
   }
 

@@ -2,20 +2,19 @@ library timesheets_resource;
 
 import 'dart:async';
 import 'dart:convert' show JSON, Utf8Codec;
-import 'dart:html' show window;
+import 'dart:html' show window, HttpRequest;
 
 import 'package:angular/angular.dart';
 import "package:google_drive_v2_api/drive_v2_api_browser.dart" as drivelib;
 import "package:google_drive_v2_api/drive_v2_api_client.dart" as client;
 import 'package:google_oauth2_client/google_oauth2_browser.dart';
-import 'package:lawndart/lawndart.dart';
 
 import 'package:chronos/chronos.dart';
 
 abstract class Resource {
   Future add(dynamic entity);
   Future remove(dynamic entity);
-  Future save(dynamic entity);
+  Future save();
   Future getAll();
 }
 
@@ -25,27 +24,23 @@ class TimesheetResource implements Resource {
 
   Future _loaded;
 
-  Store _db;
-
+  GoogleOAuth2 _auth;
   drivelib.Drive _drive;
   String _data_file_id;
 
   String JSON_MIME_TYPE = "application/json";
 
   TimesheetResource() {
-
-    _db = new Store("chronos", "timesheets");
-
     _loaded = _loadTimesheetsFromDrive();
   }
 
   drivelib.Drive _createAuthorizedDriveClient() {
     drivelib.Drive drive;
 
-    GoogleOAuth2 auth =
+    _auth =
         new GoogleOAuth2("616311253486.apps.googleusercontent.com",
-            ["https://www.googleapis.com/auth/drive.appdata"]);
-    drive = new drivelib.Drive(auth);
+            ["https://www.googleapis.com/auth/drive"]);
+    drive = new drivelib.Drive(_auth);
     drive.makeAuthRequests = true;
 
     return drive;
@@ -86,21 +81,38 @@ class TimesheetResource implements Resource {
   }
 
   Future<String> _parseDataFile(String data_file_id) {
-    return new Future.value("1");
+    return _drive.files.get(data_file_id).then((client.File data_file) {
+      
+      HttpRequest request = new HttpRequest();
+      request.open("GET", data_file.downloadUrl);
+      
+      return _auth.authenticate(request).then((request) {
+        Completer completer = new Completer();
+        
+        request.send();
+        
+        request.onLoad.listen((event) {
+          Map data_file = JSON.decode(request.responseText) as Map;
+          timesheets = data_file["timesheets"];
+          
+          completer.complete(data_file_id);
+        });
+        
+        return completer.future;
+      });
+    });
   }
 
   Future add(Timesheet timesheet) {
     return _loaded.then((_) {
       timesheets.add(timesheet);
-
-//      return _db.save(JSON.encode(timesheet), timesheet.id);
     });
   }
 
   Future remove(Timesheet timesheet) {
     timesheets.remove(timesheet);
 
-    return new Future.value(timesheet);
+    return save();
   }
 
   Future getAll() => _loaded.then((_) => new List.from(timesheets));
@@ -138,10 +150,9 @@ class TimesheetResource implements Resource {
     });
   }
 
-  Future save(Timesheet timesheet) {
-    return _loaded.then((_) {
-      return _db.save(JSON.encode(timesheet), timesheet.id);
-    });
+  Future save() {
+    // TODO: Make this save to Drive
+    return new Future.value("TODO");
   }
 
   Future<Timesheet> prevDay(Timesheet timesheet) {
