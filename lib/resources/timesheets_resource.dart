@@ -28,7 +28,9 @@ class TimesheetResource implements Resource {
   drivelib.Drive _drive;
   String _data_file_id;
 
-  String JSON_MIME_TYPE = "application/json";
+  final String JSON_MIME_TYPE = "application/json";
+  final String APP_ID = "616311253486.apps.googleusercontent.com";
+  final List<String> APP_SCOPES = ["https://www.googleapis.com/auth/drive"];
 
   TimesheetResource() {
     _loaded = _loadTimesheetsFromDrive();
@@ -38,8 +40,7 @@ class TimesheetResource implements Resource {
     drivelib.Drive drive;
 
     _auth =
-        new GoogleOAuth2("616311253486.apps.googleusercontent.com",
-            ["https://www.googleapis.com/auth/drive"]);
+        new GoogleOAuth2(APP_ID, APP_SCOPES);
     drive = new drivelib.Drive(_auth);
     drive.makeAuthRequests = true;
 
@@ -66,13 +67,24 @@ class TimesheetResource implements Resource {
 
   Future<client.FileList> _searchForDataFileCandidates() => _drive.files.list(q: "title = 'data_file.json'");
 
+  String _encodeTimesheetsForDrive() {
+    Map app_json = {'timesheets': timesheets };
+    String timesheet_json = JSON.encode(app_json);
+    return window.btoa(timesheet_json);
+  }
+
+  client.File get _generateDriveDataFile {
+    client.File data_file =
+        new client.File.fromJson({
+          'title': 'data_file.json',
+          'mimeType': JSON_MIME_TYPE });
+    return data_file;
+  }
+
   Future<String> _intializeDataFile() {
-    client.File data_file = new client.File.fromJson({ 'title': 'data_file.json', 'mimeType': JSON_MIME_TYPE });
-    String timesheet_json = JSON.encode({'timesheets': timesheets });
-    print(timesheet_json);
-    var base64data = window.btoa(timesheet_json);
-    print(base64data);
-    return _drive.files.insert(data_file, content: base64data, contentType: JSON_MIME_TYPE).
+    client.File data_file = _generateDriveDataFile;
+    String content = _encodeTimesheetsForDrive();
+    return _drive.files.insert(data_file, content: content, contentType: JSON_MIME_TYPE).
         then((client.File file) {
           _data_file_id = file.id;
         }).catchError((e) {
@@ -80,24 +92,37 @@ class TimesheetResource implements Resource {
         });
   }
 
+  Future _saveDataFile() {
+    client.File data_file = _generateDriveDataFile;
+    String content = _encodeTimesheetsForDrive();
+
+    return _drive.files.update(data_file, _data_file_id, content: content);
+  }
+
+  Future save() {
+    return _saveDataFile();
+  }
+
   Future<String> _parseDataFile(String data_file_id) {
     return _drive.files.get(data_file_id).then((client.File data_file) {
-      
+
       HttpRequest request = new HttpRequest();
       request.open("GET", data_file.downloadUrl);
-      
+
       return _auth.authenticate(request).then((request) {
         Completer completer = new Completer();
-        
+
         request.send();
-        
+
         request.onLoad.listen((event) {
           Map data_file = JSON.decode(request.responseText) as Map;
-          timesheets = data_file["timesheets"];
-          
+          Iterable timesheets_json = data_file["timesheets"] as Iterable;
+          timesheets =
+              timesheets_json.map((json) => new Timesheet.fromJson(json)).toList();
+
           completer.complete(data_file_id);
         });
-        
+
         return completer.future;
       });
     });
@@ -106,13 +131,17 @@ class TimesheetResource implements Resource {
   Future add(Timesheet timesheet) {
     return _loaded.then((_) {
       timesheets.add(timesheet);
+    }).then((_) {
+      save();
     });
   }
 
   Future remove(Timesheet timesheet) {
-    timesheets.remove(timesheet);
-
-    return save();
+    return _loaded.then((_) {
+      timesheets.remove(timesheet);
+    }).then((_) {
+      save();
+    });
   }
 
   Future getAll() => _loaded.then((_) => new List.from(timesheets));
@@ -148,11 +177,6 @@ class TimesheetResource implements Resource {
 
       return new Future.value(matches.toList());
     });
-  }
-
-  Future save() {
-    // TODO: Make this save to Drive
-    return new Future.value("TODO");
   }
 
   Future<Timesheet> prevDay(Timesheet timesheet) {
