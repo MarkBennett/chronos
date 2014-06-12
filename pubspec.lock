@@ -16,7 +16,7 @@ packages:
   asn1lib:
     description: asn1lib
     source: hosted
-    version: "0.3.0"
+    version: "0.3.2"
   barback:
     description: barback
     source: hosted
