@@ -5,13 +5,7 @@ import 'dart:async';
 import 'package:angular/angular.dart';
 import 'package:chronos/chronos.dart';
 import 'package:chronos/resources/gdrive_adapter.dart';
-
-abstract class Resource {
-  Future add(dynamic entity);
-  Future remove(dynamic entity);
-  Future save();
-  Future getAll();
-}
+import 'package:chronos/resources/resource.dart';
 
 @Injectable()
 class TimesheetResource implements Resource {
@@ -21,6 +15,7 @@ class TimesheetResource implements Resource {
 
   TimesheetResource() {
     adapter = new GDriveAdapter();
+    adapter.register("timesheets", (Map json) => new Timesheet.fromJson(json));
     _inited = _initTimesheets();
   }
 

@@ -1,3 +1,5 @@
+library gdrive_adapter;
+
 import 'dart:async';
 import 'dart:convert' show JSON, Utf8Codec;
 import 'dart:html' show window, HttpRequest;
@@ -6,7 +8,7 @@ import "package:google_drive_v2_api/drive_v2_api_browser.dart" as drivelib;
 import "package:google_drive_v2_api/drive_v2_api_client.dart" as client;
 import 'package:google_oauth2_client/google_oauth2_browser.dart';
 
-import 'package:chronos/chronos.dart';
+typedef void FromJson(Map json);
 
 class GDriveAdapter {
   final String JSON_MIME_TYPE = "application/json";
@@ -16,9 +18,19 @@ class GDriveAdapter {
   GoogleOAuth2 _auth;
   drivelib.Drive _drive;
   String _data_file_id;
-  List timesheets = [];
+  Map _data;
+  FromJson _from_json;
 
-  Future init() => _loadTimesheetsFromDrive();
+  Future save(String key, value) {
+    _data[key] = value;
+    return _saveDataFile();
+  }
+
+  get(String key) {
+    return _data[key];
+  }
+
+  Future init() => _loadValuesFromDrive();
 
   drivelib.Drive _createAuthorizedDriveClient() {
     drivelib.Drive drive;
@@ -31,7 +43,7 @@ class GDriveAdapter {
     return drive;
   }
 
-  Future _loadTimesheetsFromDrive() {
+  Future _loadValuesFromDrive() {
     _drive = _createAuthorizedDriveClient();
 
     return _loadDataFile();
@@ -49,10 +61,10 @@ class GDriveAdapter {
     });
   }
 
-  String _encodeTimesheetsForDrive() {
-    Map app_json = {'timesheets': timesheets };
-    String timesheet_json = JSON.encode(app_json);
-    return window.btoa(timesheet_json);
+  String _encodeValuesForDrive() {
+    Map app_json = _data;
+    String values_json = JSON.encode(app_json);
+    return window.btoa(values_json);
   }
 
   client.File get _generateDriveDataFile {
@@ -65,7 +77,7 @@ class GDriveAdapter {
 
   Future<String> _intializeDataFile() {
     client.File data_file = _generateDriveDataFile;
-    String content = _encodeTimesheetsForDrive();
+    String content = _encodeValuesForDrive();
     return _drive.files.insert(data_file, content: content, contentType: JSON_MIME_TYPE).
         then((client.File file) {
           _data_file_id = file.id;
@@ -76,7 +88,7 @@ class GDriveAdapter {
 
   Future _saveDataFile() {
     client.File data_file = _generateDriveDataFile;
-    String content = _encodeTimesheetsForDrive();
+    String content = _encodeValuesForDrive();
 
     return _drive.files.update(data_file, _data_file_id, content: content);
   }
@@ -95,9 +107,10 @@ class GDriveAdapter {
 
         request.onLoad.listen((event) {
           Map data_file = JSON.decode(request.responseText) as Map;
-          Iterable timesheets_json = data_file["timesheets"] as Iterable;
-          timesheets =
-              timesheets_json.map((json) => new Timesheet.fromJson(json)).toList();
+          _data = new Map();
+          data_file.forEach((key, Iterable value) {
+            _data[key] = value.map((value) => _from_json(value)).toList();
+          });
 
           completer.complete(data_file_id);
         });
@@ -110,12 +123,7 @@ class GDriveAdapter {
   Future<client.FileList> _searchForDataFileCandidates() =>
       _drive.files.list(q: "title = 'data_file.json'");
 
-  Future save(String key, value) {
-    timesheets = value;
-    return _saveDataFile();
-  }
-
-  get(String key) {
-    return timesheets;
+  void register(String s, FromJson from_json) {
+    _from_json = from_json;
   }
 }
