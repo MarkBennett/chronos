@@ -76,7 +76,7 @@ packages:
   intl:
     description: intl
     source: hosted
-    version: "0.9.9"
+    version: "0.9.10"
   json_web_token:
     description: json_web_token
     source: hosted
