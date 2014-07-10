@@ -6,7 +6,9 @@ void chronosRouteInitializer(Router router, RouteViewFactory views) {
   views.configure({
     'timesheet': ngRoute(
         path: '/timesheet',
-        view: 'view/timesheet/index.html',
-        defaultRoute: true)
+        view: 'view/timesheet/index.html'),
+    'client': ngRoute(
+        path: '/client',
+        view: 'view/client/index.html')
   });
 }
