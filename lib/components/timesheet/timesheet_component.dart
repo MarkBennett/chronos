@@ -16,8 +16,8 @@ class TimesheetComponent {
 
   Timesheet timesheet;
   String id = "";
-  double hours = 1.0;
-  double minutes = 0.0;
+  num hours = 1;
+  num minutes = 0;
   String description = "";
   String client = "";
   TimesheetResource _timesheets_resource;
