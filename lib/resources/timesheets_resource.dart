@@ -20,10 +20,8 @@ class TimesheetResource implements Resource {
   }
 
   Future _initTimesheets() {
-    return adapter.init().then((_) {
-      return adapter.get('timesheets');
-    }).then((loaded) {
-      timesheets = loaded;
+    return adapter.get('timesheets').then((timesheets) {
+      this.timesheets = timesheets;
     });
   }
 

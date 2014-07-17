@@ -21,16 +21,27 @@ class GDriveAdapter {
   Map _data;
   FromJson _from_json;
 
+  Future _inited;
+
   Future save(String key, value) {
-    _data[key] = value;
-    return _saveDataFile();
+    return _init().then((_) {
+      _data[key] = value;
+
+      return _saveDataFile();
+    });
   }
 
-  get(String key) {
-    return _data[key];
+  Future get(String key) {
+    return _init().then((_) => _data[key]);
   }
 
-  Future init() => _loadValuesFromDrive();
+  Future _init() {
+    if (_inited == null) {
+      _inited = _loadValuesFromDrive();
+    }
+
+    return _inited;
+  }
 
   drivelib.Drive _createAuthorizedDriveClient() {
     drivelib.Drive drive;
