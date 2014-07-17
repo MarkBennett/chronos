@@ -22,6 +22,8 @@ class ChronosModule extends Module {
     bind(ClientComponent);
     bind(DurationFilter);
     bind(RouteInitializerFn, toValue: chronosRouteInitializer);
+    bind(NgRoutingUsePushState,
+        toFactory: (_) => new NgRoutingUsePushState.value(false));
   }
 }
 
