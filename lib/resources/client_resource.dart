@@ -6,14 +6,21 @@ import 'package:angular/angular.dart';
 import 'package:chronos/resources/resource.dart';
 import 'package:chronos/resources/gdrive_adapter.dart';
 
-class Client {
+class Client extends Entity {
   String id;
   String name;
 
-  Client(this.id, this.name);
-  Client.fromJson(json) {
+  Client(resource, this.id, this.name) : super(resource);
+  Client.fromJson(json) : super(null) {
     this.id = json["id"];
     this.name = json["name"];
+  }
+
+  Map toJson() {
+    return {
+      id: id,
+      name: name
+    };
   }
 }
 
@@ -27,41 +34,49 @@ class ClientResource extends Resource {
 
   ClientResource() {
     adapter = new GDriveAdapter();
-    adapter.register("clients", (Map json) => new Client.fromJson(json));
+    adapter.register("clients", this, (Map json) => new Client.fromJson(json));
 
-    _inited = _initClients();
+    _inited = _init();
 
     clients = [
-      new Client("1", "Bob"),
-      new Client("2", "Jane")
+      new Client(this, "1", "Bob"),
+      new Client(this, "2", "Jane")
     ];
   }
 
-  Future _initClients() {
+  Future _init() {
     return adapter.get("clients").then((clients) {
-      this.clients = clients;
+      // TODO: Actually start saving these
+//      this.clients = clients;
     });
   }
 
   @override
-  Future add(entity) {
-    clients.add(entity);
-    return new Future.value(entity);
+  Future get all => _init().then((_) => clients);
+
+  Future _destroy(entity) {
+    return _init().then((_) => clients.remove(entity));
   }
 
-  @override
-  Future getAll() {
-    return new Future.value(clients);
+  // Save a Client. If they haven't been saved before, then do so now.
+  Future save(Client client) {
+    return _init().
+        then((_) {
+          if (client.id == null) {
+            var id = _generateId();
+            client.id = id;
+
+            clients.add(client);
+          }
+        }).
+        then((_) => adapter.save("clients", clients)).
+        then((_) => clients);
   }
 
-  @override
-  Future remove(entity) {
-    clients.remove(entity);
-    return new Future.value(entity);
-  }
+  String _generateId() => "client_" + new DateTime.now().millisecondsSinceEpoch.toString();
 
-  @override
-  Future save() {
-    return new Future.value(clients);
+  // Create a new unsaved Client
+  Client create() {
+    return new Client(this, null, "");
   }
 }

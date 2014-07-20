@@ -2,4 +2,10 @@
 
 <ul>
   <li ng-repeat="client in ctrl.clients">{{ client.name }}</li>
+  <li>
+    <form ng-submit="ctrl.add()">
+      <input type="text" ng-model="ctrl.editClient.name" placeholder="name">
+      <button type="submit">Add</button>
+    </form>
+  </li>
 </ul>

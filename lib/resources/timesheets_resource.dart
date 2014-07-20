@@ -7,6 +7,8 @@ import 'package:chronos/chronos.dart';
 import 'package:chronos/resources/gdrive_adapter.dart';
 import 'package:chronos/resources/resource.dart';
 
+part 'timesheet.dart';
+
 @Injectable()
 class TimesheetResource implements Resource {
   List<Timesheet> timesheets = [];
@@ -15,37 +17,41 @@ class TimesheetResource implements Resource {
 
   TimesheetResource() {
     adapter = new GDriveAdapter();
-    adapter.register("timesheets", (Map json) => new Timesheet.fromJson(json));
-    _inited = _initTimesheets();
+    adapter.register("timesheets", this, (Map json) => new Timesheet.fromJson(json));
+    _inited = _init();
   }
 
-  Future _initTimesheets() {
+  Future _init() {
     return adapter.get('timesheets').then((timesheets) {
       this.timesheets = timesheets;
     });
   }
 
-  Future save() {
+  Future save(Timesheet timesheet) {
+    return _init().
+        then((_) {
+          if (timesheet.id == null) {
+              timesheet.id = _generateId();
+              timesheets.add(timesheet);
+            }
+          return timesheet;
+        }).
+        then((_) => _saveAll());
+  }
+
+  Future _saveAll() {
     return adapter.save('timesheets', timesheets);
   }
 
-  Future add(Timesheet timesheet) {
-    return _inited.then((_) {
-      timesheets.add(timesheet);
-    }).then((_) {
-      save();
-    });
-  }
-
-  Future remove(Timesheet timesheet) {
+  Future _destroy(Timesheet timesheet) {
     return _inited.then((_) {
       timesheets.remove(timesheet);
     }).then((_) {
-      save();
+      _saveAll();
     });
   }
 
-  Future getAll() => _inited.then((_) => new List.from(timesheets));
+  Future get all => _inited.then((_) => new List.from(timesheets));
 
   Future<Timesheet> today() {
     return _inited.then((_) {
@@ -57,10 +63,12 @@ class TimesheetResource implements Resource {
 
       if (matches.isNotEmpty) {
         today = matches.first;
+
         return today;
       } else {
-        today = new Timesheet("1", [], new DateTime.now());
-        return add(today).then((_) => today);
+        today = create();
+
+        return today.save();
       }
     });
   }
@@ -88,13 +96,15 @@ class TimesheetResource implements Resource {
         return matches.first;
       } else {
         Timesheet timesheet =
-            new Timesheet(new DateTime.now().millisecondsSinceEpoch.toString(),
+            new Timesheet(this, _generateId(),
                 [], previous_day);
         timesheets.add(timesheet);
         return timesheet;
       }
     });
   }
+
+  String _generateId() => new DateTime.now().millisecondsSinceEpoch.toString();
 
   Future<Timesheet> nextDay(Timesheet timesheet) {
     DateTime next_day = timesheet.starts_at.add(new Duration(days: 1));
@@ -104,11 +114,16 @@ class TimesheetResource implements Resource {
         return matches.first;
       } else {
         Timesheet timesheet =
-            new Timesheet(new DateTime.now().millisecondsSinceEpoch.toString(),
+            new Timesheet(this, _generateId(),
                 [], next_day);
         timesheets.add(timesheet);
         return timesheet;
       }
     });
+  }
+
+  @override
+  Entity create() {
+    return new Timesheet(this, null, [], new DateTime.now());
   }
 }

@@ -12,9 +12,21 @@ import 'package:chronos/resources/client_resource.dart';
 class ClientComponent {
   ClientResource _resource;
 
+  Client editClient;
+
   List<Client> clients;
 
   ClientComponent(ClientResource this._resource) {
-    _resource.getAll().then((clients) => this.clients = clients);
+    _resource.all.
+      then((clients) => this.clients = clients).
+      then((_) {
+        editClient = _resource.create();
+      });
+  }
+
+  add() {
+    editClient.save().then((_) {
+      editClient = _resource.create();
+    });
   }
 }

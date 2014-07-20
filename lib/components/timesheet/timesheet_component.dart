@@ -73,7 +73,7 @@ class TimesheetComponent {
   _addEntry(Entry entry) {
     entry.id = new DateTime.now().millisecondsSinceEpoch.toString();
     timesheet.entries.add(entry);
-    _timesheets_resource.save();
+    timesheet.save();
   }
 
   _saveEntry(Entry entry) {
@@ -82,13 +82,13 @@ class TimesheetComponent {
       e.description = entry.description;
       e.duration = entry.duration;
     });
-    _timesheets_resource.save();
+    timesheet.save();
   }
 
   removeEntry(Entry entry) {
     _loaded.then((_) {
       timesheet.entries.remove(entry);
-      _timesheets_resource.save();
+      timesheet.save();
     });
   }
 
@@ -100,9 +100,5 @@ class TimesheetComponent {
   toNextDay() {
     _timesheets_resource.nextDay(timesheet).
       then((prev_days_timesheet) => timesheet = prev_days_timesheet);
-  }
-
-  onKeypress(event) {
-    print("You're typing?");
   }
 }

@@ -4,11 +4,20 @@ import 'dart:async';
 import 'dart:convert' show JSON, Utf8Codec;
 import 'dart:html' show window, HttpRequest;
 
+import 'package:chronos/resources/resource.dart';
 import "package:google_drive_v2_api/drive_v2_api_browser.dart" as drivelib;
 import "package:google_drive_v2_api/drive_v2_api_client.dart" as client;
 import 'package:google_oauth2_client/google_oauth2_browser.dart';
 
-typedef void FromJson(Map json);
+typedef Entity FromJson(Map json);
+
+class RegisteredResource {
+  String name;
+  Resource resource;
+  FromJson fromJson;
+
+  RegisteredResource(this.name, this.resource, this.fromJson);
+}
 
 class GDriveAdapter {
   final String JSON_MIME_TYPE = "application/json";
@@ -19,7 +28,7 @@ class GDriveAdapter {
   drivelib.Drive _drive;
   String _data_file_id;
   Map _data;
-  FromJson _from_json;
+  Map _resources = new Map();
 
   Future _inited;
 
@@ -120,7 +129,13 @@ class GDriveAdapter {
           Map data_file = JSON.decode(request.responseText) as Map;
           _data = new Map();
           data_file.forEach((key, Iterable value) {
-            _data[key] = value.map((value) => _from_json(value)).toList();
+            _data[key] = value.map((value) {
+              RegisteredResource resource = _resources[key];
+              Entity entity = resource.fromJson(value);
+              entity.resource = resource.resource;
+
+              return entity;
+            }).toList();
           });
 
           completer.complete(data_file_id);
@@ -134,7 +149,7 @@ class GDriveAdapter {
   Future<client.FileList> _searchForDataFileCandidates() =>
       _drive.files.list(q: "title = 'data_file.json'");
 
-  void register(String s, FromJson from_json) {
-    _from_json = from_json;
+  void register(String name, Resource resource, FromJson from_json) {
+    _resources[name] = new RegisteredResource(name, resource, from_json);
   }
 }
