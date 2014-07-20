@@ -5,5 +5,7 @@ dependencies:
   browser: any
   google_drive_v2_api: any
   web_components: any
+dev_dependencies:
+  unittest: any
 transformers:
 - angular
