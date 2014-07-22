@@ -1,20 +1,20 @@
 library resource;
 
 import 'dart:async';
+import 'dart:collection';
 
 part 'entity.dart';
 
-abstract class Resource {
+abstract class Resource extends Stream {
   // Create a new and unsaved entity
   Entity create();
-
-  // Get all the entities associated with this resource
-  @deprecated("when Resource implements stream")
-  Future get all;
 
   // Callback invoked when an Entity belonging to this Resource is saved
   Future save(Entity entity);
 
   // Callback invoked when an Entity belonging to this Resource is destroyed
-  Future _destroy(Entity entity);
+  Future destroy(Entity entity);
+
+  @override
+  StreamSubscription listen(void onData(event), {Function onError, void onDone(), bool cancelOnError});
 }

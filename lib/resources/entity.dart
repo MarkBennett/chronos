@@ -5,5 +5,5 @@ abstract class Entity {
 
   Entity(Resource this.resource);
   Future save() => resource.save(this);
-  Future destroy() => resource._destroy(this);
+  Future destroy() => resource.destroy(this);
 }

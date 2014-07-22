@@ -10,7 +10,7 @@ import 'package:chronos/resources/resource.dart';
 part 'timesheet.dart';
 
 @Injectable()
-class TimesheetResource implements Resource {
+class TimesheetResource extends Resource {
   List<Timesheet> timesheets = [];
   Future _inited;
   GDriveAdapter adapter;
@@ -43,7 +43,7 @@ class TimesheetResource implements Resource {
     return adapter.save('timesheets', timesheets);
   }
 
-  Future _destroy(Timesheet timesheet) {
+  Future destroy(Timesheet timesheet) {
     return _inited.then((_) {
       timesheets.remove(timesheet);
     }).then((_) {
@@ -125,5 +125,10 @@ class TimesheetResource implements Resource {
   @override
   Entity create() {
     return new Timesheet(this, null, [], new DateTime.now());
+  }
+
+  @override
+  StreamSubscription listen(void onData(event), {Function onError, void onDone(), bool cancelOnError}) {
+    return new Stream.fromIterable(timesheets).listen(onData, onError: onError, onDone: onDone, cancelOnError: cancelOnError);
   }
 }

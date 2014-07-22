@@ -51,10 +51,7 @@ class ClientResource extends Resource {
     });
   }
 
-  @override
-  Future get all => _init().then((_) => clients);
-
-  Future _destroy(entity) {
+  Future destroy(entity) {
     return _init().then((_) => clients.remove(entity));
   }
 
@@ -79,4 +76,8 @@ class ClientResource extends Resource {
   Client create() {
     return new Client(this, null, "");
   }
+
+  // TODO: implement iterator
+  @override
+  Iterator get iterator => null;
 }
