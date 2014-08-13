@@ -1,7 +1,6 @@
 library resource;
 
 import 'dart:async';
-import 'dart:collection';
 
 part 'entity.dart';
 

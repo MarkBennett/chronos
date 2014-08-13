@@ -57,41 +57,39 @@ class TimesheetResource extends Resource {
     return _inited.then((_) {
       DateTime todays_date = new DateTime.now();
 
-      return where(starts_at: todays_date);
+      return starts_at(todays_date);
     }).then((matches) {
       Timesheet today;
 
       if (matches.isNotEmpty) {
         today = matches.first;
-
-        return today;
       } else {
-        today = create();
-
-        return today.save();
+        today = create()..save();
       }
+
+      return today;
     });
   }
 
-  Future<List<Timesheet>> where({DateTime starts_at}) {
+  Future<Iterable<Timesheet>> starts_at(DateTime date) {
     return _inited.then((_) {
       var matches = timesheets;
 
-      if (starts_at != null) {
+      if (date != null) {
         matches = matches.where((Timesheet timesheet) =>
-          timesheet.starts_at.year == starts_at.year &&
-          timesheet.starts_at.month == starts_at.month &&
-          timesheet.starts_at.day == starts_at.day);
+          timesheet.starts_at.year == date.year &&
+          timesheet.starts_at.month == date.month &&
+          timesheet.starts_at.day == date.day);
       }
 
-      return new Future.value(matches.toList());
+      return matches;
     });
   }
 
   Future<Timesheet> prevDay(Timesheet timesheet) {
     DateTime previous_day = timesheet.starts_at.subtract(new Duration(days: 1));
 
-    return where(starts_at: previous_day).then((matches) {
+    return starts_at(previous_day).then((matches) {
       if (matches.isNotEmpty) {
         return matches.first;
       } else {
@@ -109,7 +107,7 @@ class TimesheetResource extends Resource {
   Future<Timesheet> nextDay(Timesheet timesheet) {
     DateTime next_day = timesheet.starts_at.add(new Duration(days: 1));
 
-    return where(starts_at: next_day).then((matches) {
+    return starts_at(next_day).then((matches) {
       if (matches.isNotEmpty) {
         return matches.first;
       } else {
@@ -129,6 +127,7 @@ class TimesheetResource extends Resource {
 
   @override
   StreamSubscription listen(void onData(event), {Function onError, void onDone(), bool cancelOnError}) {
-    return new Stream.fromIterable(timesheets).listen(onData, onError: onError, onDone: onDone, cancelOnError: cancelOnError);
+    return new Stream.fromIterable(timesheets).
+        listen(onData, onError: onError, onDone: onDone, cancelOnError: cancelOnError);
   }
 }

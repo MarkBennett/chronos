@@ -17,7 +17,7 @@ class ClientComponent {
   List<Client> clients;
 
   ClientComponent(ClientResource this._resource) {
-    _resource.all.
+    _resource.toList().
       then((clients) => this.clients = clients).
       then((_) {
         editClient = _resource.create();

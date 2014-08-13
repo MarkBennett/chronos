@@ -77,7 +77,9 @@ class ClientResource extends Resource {
     return new Client(this, null, "");
   }
 
-  // TODO: implement iterator
   @override
-  Iterator get iterator => null;
+  StreamSubscription listen(void onData(event), {Function onError, void onDone(), bool cancelOnError}) {
+    return new Stream.fromIterable(clients).
+        listen(onData, onError: onError, onDone: onDone, cancelOnError: cancelOnError);
+  }
 }

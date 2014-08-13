@@ -36,7 +36,8 @@ class ConcreteResource extends Resource {
 
   @override
   StreamSubscription listen(void onData(event), {Function onError, void onDone(), bool cancelOnError}) {
-    return new Stream.fromIterable(entities).listen(onData, onError: onError, onDone: onDone, cancelOnError: cancelOnError);
+    return new Stream.fromIterable(entities).
+        listen(onData, onError: onError, onDone: onDone, cancelOnError: cancelOnError);
   }
 }
 
@@ -47,13 +48,14 @@ main() {
     ConcreteEntity entity = resource.create();
     entity..name = "Mike";
 
-    entity.save();
-
-    return resource.toSet().then((e) {
-      Set entities =
-          [ "Bob", "Sarah", "Mike"].toSet();
-
-      expect(e.map((e) => e.name).toSet(), equals(entities));
-    });
+    return resource.toSet().
+      then((resources) => resources..add(entity)).
+      then((expected) {
+          return entity.save().
+            then((_) => resource.toSet()).
+            then((resources) {
+              expect(resources, equals(expected));
+            });
+      });
   });
 }
